@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+  <!-- Internal CSS -->
+  <style type="text/css">
+    /* Button colors */
+    #pink {
+      background-color:#F50057;
+      border-color:#F50057;
+    }
+    #blue {
+      background-color:#2979FF;
+      border-color:#2979FF;
+    }
+    #yellow {
+      background-color:#FFD600;
+      border-color:#FFD600;
+    }
+    #black {
+      background-color:#000000;
+      border-color:#000000;
+    }
+    /* Icon color */
+    i.white {
+      color:white;
+    }
+
+    /* Control panel styling */
+    #controls {
+      width:960px;
+      margin:0 auto;
+      text-align:center;
+      margin-top:20px;
+    }
+
+   /* Canvas area styling */
+   #drawingArea {
+     width:960px;
+     margin:0 auto;
+   }
+
+   /* Heading styling */
+   h1 {
+     font-size:34px;
+     text-align:center;
+     margin-top:60px;
+   }
+  </style>
+
+</head>
+<!-- Body starts here -->
+<body>
+
+  <!-- Heading -->
+  <h1> Let's Paint! </h1>
+
+  <!-- Canvas area -->
+  <div id="drawingArea">
+    <canvas id="main" width="960" height="500" style="border:1px solid #ccc;">
+      Here is my canvas.
+    </canvas>
+  </div>
+
+  <!-- Control panel -->
+  <div id="controls">
+    <!-- Buttons for various actions -->
+    <button id="new" class="btn btn-action">
+      <i class="far fa-file"></i> <!-- New canvas button -->
+    </button>
+
+    <button id="erase" class="btn btn-action">
+      <i class="fas fa-eraser"></i> <!-- Erase button -->
+    </button>
+
+    <button id="black" class="btn btn-action" >
+      <i class="fas fa-paint-brush white"></i> <!-- Black color button -->
+    </button>
+    <button id="pink" class="btn btn-action" >
+      <i class="fas fa-paint-brush white"></i> <!-- Pink color button -->
+    </button>
+    <button id="blue" class="btn btn-action">
+      <i class="fas fa-paint-brush white"></i> <!-- Blue color button -->
+    </button>
+    <button id="yellow" class="btn btn-action">
+      <i class="fas fa-paint-brush white"></i> <!-- Yellow color button -->
+    </button>
+
+    <br>
+
+    <!-- Brush size slider -->
+    Brush size:
+    <input id="slider" type="range" min="2" max="15" step="1" />
+    <span id="brushSize"></span>
+  </div>
+
+  <!-- Log area (currently not used) -->
+  <div id="log"></div>
+
+  <!-- JavaScript code -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const canvas = document.getElementById('main');
+      const ctx = canvas.getContext('2d');
+      let painting = false;
+      let brushSize = 5;
+      let color = '#000000'; // Default color is black
+
+      function startPosition(e) {
+          painting = true;
+          draw(e);
+      }
+
+      function finishedPosition() {
+          painting = false;
+          ctx.beginPath();
+      }
+
+      function draw(e) {
+          if (!painting) return;
+
+          ctx.lineWidth = brushSize;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = color;
+
+          ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      }
+
+      // Event Listeners for drawing
+      canvas.addEventListener('mousedown', startPosition);
+      canvas.addEventListener('mouseup', finishedPosition);
+      canvas.addEventListener('mousemove', draw);
+
+      // Color buttons
+      document.querySelectorAll('.btn-action').forEach(item => {
+          item.addEventListener('click', function() {
+              color = window.getComputedStyle(item, null).getPropertyValue('background-color');
+              ctx.beginPath(); // Reset the path so color doesn't drag if switching mid-draw
+          });
+      });
+
+      // Erase button
+      document.getElementById('erase').addEventListener('click', function() {
+          color = '#FFFFFF'; // Change color to white for erasing
+      });
+
+      // New canvas
+      document.getElementById('new').addEventListener('click', function() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      // Brush size slider
+      const slider = document.getElementById('slider');
+      const brushSizeDisplay = document.getElementById('brushSize');
+      slider.value = brushSize; // Default brush size
+      brushSizeDisplay.textContent = brushSize;
+
+      slider.addEventListener('input', function() {
+          brushSize = this.value;
+          brushSizeDisplay.textContent = brushSize;
+      });
+  });
+  </script>
+</body>
+</html>
